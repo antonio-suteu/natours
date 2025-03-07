@@ -111,3 +111,44 @@ exports.getTourStats = async (req, res) => {
     });
   }
 };
+
+// Returns the number of tours for each month in a given year
+exports.getMonthlyPlan = async (req, res) => {
+  try {
+    const year = req.params.year * 1;
+
+    const plan = await Tour.aggregate([
+      {
+        // decompose each document into multiple ones (startDates is an array of dates)
+        $unwind: '$startDates'
+      },
+      {
+        // match tours created in the given year
+        $match: {
+          startDates: {
+            $gte: new Date(year, 0, 1),
+            $lte: new Date(year, 12, 31)
+          }
+        }
+      },
+      {
+        $group: {
+          _id: { $month: '$startDates' }, //group tours by month
+          numTourStarts: { $sum: 1 }, //count the number of tours in each month
+          tours: { $push: '$name' } // create array of the names of each tour
+        }
+      },
+      { $addFields: { month: '$_id' } }, //add a field called month to the results
+      { $project: { _id: 0 } }, //hide the _id field
+      { $sort: { numTourStarts: -1 } }, //sort by tour starts in desc order
+      { $limit: 12 } //limit the result to the first 12 months (just used for reference)
+    ]);
+
+    res.status(200).send({ status: 'success', data: { plan } });
+  } catch (e) {
+    res.status(404).json({
+      status: 'fail',
+      message: e.message
+    });
+  }
+};
