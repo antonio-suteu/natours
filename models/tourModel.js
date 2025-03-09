@@ -51,7 +51,7 @@ const tourSchema = new mongoose.Schema(
       defaut: 0,
       validate: {
         validator: function (val) {
-          // ONLY WORKS WHEN CREATING NEW DOCUMENTS (not update)
+          // only works on new document creation (not update)
           return val < this.price;
         },
         message: 'Discount price ({VALUE}) should be below regular price'
