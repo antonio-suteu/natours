@@ -19,7 +19,7 @@ exports.createNewTour = async (req, res) => {
     const newTour = await Tour.create(req.body);
     res.status(201).send({ status: 'success', data: { tour: newTour } });
   } catch (error) {
-    res.status(400).send({ status: 'fail', message: error.message });
+    res.status(400).send({ status: 'fail', message: error });
   }
 };
 
@@ -38,7 +38,7 @@ exports.getAllTours = async (req, res) => {
       .status(200)
       .send({ status: 'success', results: tours.length, data: { tours } });
   } catch (error) {
-    res.status(404).send({ status: 'fail', message: error.message });
+    res.status(404).send({ status: 'fail', message: error });
   }
 };
 exports.getTour = async (req, res) => {
@@ -46,14 +46,14 @@ exports.getTour = async (req, res) => {
     const tour = await Tour.findById(req.params.id);
     res.status(200).send({ status: 'success', data: { tour } });
   } catch (error) {
-    res.status(404).send({ status: 'fail', message: error.message });
+    res.status(404).send({ status: 'fail', message: error });
   }
 };
 exports.updateTour = async (req, res) => {
   try {
     const tourToUpdate = await Tour.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
-      runValidators: true
+      runValidators: true //this uses the validators declared in the Tour model
     });
     res.json({
       status: 'success',
@@ -62,7 +62,7 @@ exports.updateTour = async (req, res) => {
   } catch (error) {
     res.status(404).json({
       status: 'fail',
-      message: error.message
+      message: error
     });
   }
 };
@@ -77,7 +77,7 @@ exports.deleteTour = async (req, res) => {
   } catch (error) {
     res.status(404).json({
       status: 'fail',
-      message: error.message
+      message: error
     });
   }
 };
@@ -107,7 +107,7 @@ exports.getTourStats = async (req, res) => {
   } catch (error) {
     res.status(404).json({
       status: 'fail',
-      message: error.message
+      message: error
     });
   }
 };
@@ -145,10 +145,10 @@ exports.getMonthlyPlan = async (req, res) => {
     ]);
 
     res.status(200).send({ status: 'success', data: { plan } });
-  } catch (e) {
+  } catch (error) {
     res.status(404).json({
       status: 'fail',
-      message: e.message
+      message: error
     });
   }
 };
