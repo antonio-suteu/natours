@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+// eslint-disable-next-line import/no-extraneous-dependencies
+const slugify = require('slugify');
 
 const tourSchema = new mongoose.Schema(
   {
@@ -8,6 +10,7 @@ const tourSchema = new mongoose.Schema(
       unique: true,
       trim: true
     },
+    slug: String, //needed for slugifying
     summary: {
       type: String,
       trim: true,
@@ -34,7 +37,8 @@ const tourSchema = new mongoose.Schema(
     },
     images: [String],
     createdAt: { type: Date, default: Date.now(), select: false }, //select: set to false, it hides from response
-    startDates: [Date]
+    startDates: [Date],
+    secretTour: { type: Boolean, default: false } //Will be used by Query middleware
   },
   {
     // schema options
@@ -50,10 +54,48 @@ tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
 
-// DOCUMENT MIDDLEWARE: runs before .save() & .create() functions
-tourSchema.pre('save', function () {
-  console.warn(this);
+// #region Type of Mongoose Middlewares
+// 1. DOCUMENT MIDDLEWARE: runs before .save() & .create() functions
+// NOTE: does not work for .saveMany()
+tourSchema.pre('save', function (next) {
+  this.slug = slugify(this.name, { lower: true });
+  next();
 });
+
+// tourSchema.pre('save', (next) => {
+//   console.log('Will save document...');
+//   next();
+// });
+
+// tourSchema.post('save', (doc, next) => {
+//   console.log('New tour created!', doc);
+//   next();
+// });
+
+// 2. QUERY MIDDLEWARE: runs before the query gets executed
+// /^find/ is a regex that matches the strings that start with 'find'
+tourSchema.pre(/^find/, function (next) {
+  this.find({ secretTour: { $ne: true } });
+
+  this.queryStart = Date.now();
+  next();
+});
+
+// runs after the query gets executed, so we get access to the returned documents
+tourSchema.post(/^find/, (docs, next) => {
+  console.log(`Query took ${Date.now() - this.queryStart} milliseconds`);
+  next();
+});
+
+// 3. AGGREGATION MIDDLEWARE
+tourSchema.pre('aggregate', function (next) {
+  // pipeline() returs the curent pipeline
+  // unshift() adds a new stage to the beginning of the pipeline
+  // $match stage filters the documents to only include those where the secretTour field is not true
+  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+  next();
+});
+//#endregion
 
 const Tour = mongoose.model('Tour', tourSchema);
 
