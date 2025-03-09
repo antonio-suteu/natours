@@ -46,7 +46,17 @@ const tourSchema = new mongoose.Schema(
     },
     ratingsQuantity: { type: Number, default: 0 },
     price: { type: Number, required: [true, 'A tour must have a price'] },
-    priceDiscount: { type: Number, default: 0, min: 0, max: 100 },
+    priceDiscount: {
+      type: Number,
+      defaut: 0,
+      validate: {
+        validator: function (val) {
+          // ONLY WORKS WHEN CREATING NEW DOCUMENTS (not update)
+          return val < this.price;
+        },
+        message: 'Discount price ({VALUE}) should be below regular price'
+      }
+    },
     imageCover: {
       type: String,
       required: [true, 'A tour must have a cover image']
