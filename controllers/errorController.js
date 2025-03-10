@@ -1,9 +1,24 @@
 const AppError = require('../utils/appError');
 
+//#region operational Error handlers
+
 const handleCastErrorDB = (err) => {
   const message = `Invalid ${err.path}: ${err.value}`;
   return new AppError(message, 400);
 };
+
+const handleDuplicateFieldsDB = (err) => {
+  const message = `Duplicate field value: "${err.keyValue.name}". Plese use another value`;
+  return new AppError(message, 400);
+};
+
+const handleValidationErrorDB = (err) => {
+  const errors = Object.values(err.errors).map((e) => e.message);
+  const message = `Invalid input data: ${errors.join('. ')}`;
+  return new AppError(message, 400);
+};
+
+//#endregion
 
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
@@ -50,11 +65,11 @@ module.exports = (err, req, res, next) => {
     // make a hard copy of the err object
     let error = { ...err };
 
-    if (err.name === 'CastError') {
-      error = handleCastErrorDB(error);
-    }
+    //add more specific error handling here for different operational error types
+    if (err.name === 'CastError') error = handleCastErrorDB(error);
+    if (err.name === 'ValidationError') error = handleValidationErrorDB(error);
+    if (err.code === 11000) error = handleDuplicateFieldsDB(error);
 
-    //simple error
     sendErrorProd(error, res);
   }
   next();
