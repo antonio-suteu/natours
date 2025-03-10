@@ -1,5 +1,6 @@
 const Tour = require('../models/tourModel');
 const APIFeatures = require('../utils/apiFeatures');
+const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 
 //#region Middleware logic
@@ -37,22 +38,36 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
 
 exports.getTour = catchAsync(async (req, res, next) => {
   const tour = await Tour.findById(req.params.id);
+
+  if (!tour) {
+    return next(new AppError('No tour found with that ID', 404));
+  }
+
   res.status(200).send({ status: 'success', data: { tour } });
 });
 
 exports.updateTour = catchAsync(async (req, res, next) => {
-  const tourToUpdate = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true //this uses the validators declared in the Tour model
   });
+
+  if (!tour) {
+    return next(new AppError('No tour found with that ID', 404));
+  }
+
   res.json({
     status: 'success',
-    data: { tour: tourToUpdate }
+    data: { tour: tour }
   });
 });
 
 exports.deleteTour = catchAsync(async (req, res, next) => {
-  await Tour.findByIdAndDelete(req.params.id);
+  const tour = await Tour.findByIdAndDelete(req.params.id);
+
+  if (!tour) {
+    return next(new AppError('No tour found with that ID', 404));
+  }
 
   res.status(204).json({
     status: 'success',
