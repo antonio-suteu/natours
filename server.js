@@ -15,7 +15,16 @@ mongoose.connect(connStringDB).then(() => {
 
 const port = process.env.PORT || 8000;
 const hostname = 'localhost';
-app.listen(port, hostname, () => {
+const server = app.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
   console.warn('Waiting for requests...');
+});
+
+process.on('unhandledRejection', (err) => {
+  console.error('Unhandled rejection error:', err.message);
+  console.log('SHUTTING DOWN 💣...');
+  // closing the server gracefully
+  server.close(() => {
+    process.exit(1); // exit the process with an error
+  });
 });
