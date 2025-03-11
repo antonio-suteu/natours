@@ -7,6 +7,7 @@ DataBase:
 
 Other Node packages used:
 - dotenv (for storing configuration in the environment separate from code)
+- bcryptjs (for password encryption and decryption)
 - morgan (an HTTP request logger middleware for Node.js)
 - validator (a library of string validators and sanitizers)
 - slugify (for string slugification)
