@@ -70,7 +70,7 @@ const tourSchema = new mongoose.Schema(
     secretTour: { type: Boolean, default: false } //Will be used by Query middleware
   },
   {
-    // schema options
+    // schema options that allow for virtual properties
     toJSON: { virtuals: true },
     toObject: { virtuals: true }
   }
