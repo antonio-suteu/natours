@@ -18,6 +18,12 @@ const handleValidationErrorDB = (err) => {
   return new AppError(message, 400);
 };
 
+const handleJWTError = (val) =>
+  new AppError('Invalid token. Please log in again!', 401);
+
+const handleJWTExpiredError = (val) =>
+  new AppError('Your token has expired! Please log in again!', 401);
+
 //#endregion
 
 const sendErrorDev = (err, res) => {
@@ -50,7 +56,7 @@ const sendErrorProd = (err, res) => {
 };
 
 // since this function has 4 params, Express knows this is a global error handling middleware
-module.exports = (err, req, res, next) => {
+module.exports = (err, _req, res, next) => {
   //this prints out the stack trace
   //console.log(err.stack);
 
@@ -63,12 +69,14 @@ module.exports = (err, req, res, next) => {
     sendErrorDev(err, res);
   } else if (process.env.NODE_ENV === 'production') {
     // make a hard copy of the err object
-    let error = { ...err };
+    let error = { ...err, message: err.message };
 
     //add more specific error handling here for different operational error types
+    if (err.code === 11000) error = handleDuplicateFieldsDB(error);
     if (err.name === 'CastError') error = handleCastErrorDB(error);
     if (err.name === 'ValidationError') error = handleValidationErrorDB(error);
-    if (err.code === 11000) error = handleDuplicateFieldsDB(error);
+    if (err.name === 'JsonWebTokenError') error = handleJWTError(error);
+    if (err.name === 'TokenExpiredError') error = handleJWTExpiredError(error);
 
     sendErrorProd(error, res);
   }

@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
-// eslint-disable-next-line import/no-extraneous-dependencies
 const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
@@ -35,7 +34,8 @@ const userSchema = new mongoose.Schema({
       },
       message: 'Passwords are not the same!'
     }
-  }
+  },
+  passwordChangedAt: Date
 });
 
 // password encryption
@@ -51,13 +51,30 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-// instance method is available on all documents of a certain collection
+// instance methods are available on all documents of a certain collection
+// #region Instance Methods
 userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword // we pass the userPassword because se have hidden the password field in the schema
 ) {
   return await bcrypt.compare(candidatePassword, userPassword);
 };
+
+///If user changed password AFTER TOKEN generation
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+  if (this.passwordChangedAt) {
+    const changedTimestamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10
+    );
+    return JWTTimestamp < changedTimestamp;
+  }
+
+  // False means not changed
+  return false;
+};
+
+//#endregion
 
 const User = mongoose.model('User', userSchema);
 module.exports = User;

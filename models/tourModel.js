@@ -111,10 +111,10 @@ tourSchema.pre(/^find/, function (next) {
 });
 
 // runs after the query gets executed, so we get access to the returned documents
-tourSchema.post(/^find/, (docs, next) => {
-  console.log(`Query took ${Date.now() - this.queryStart} milliseconds`);
-  next();
-});
+// tourSchema.post(/^find/, (docs, next) => {
+//   console.log(`Query took ${Date.now() - this.queryStart} milliseconds`);
+//   next();
+// });
 
 // 3. AGGREGATION MIDDLEWARE
 tourSchema.pre('aggregate', function (next) {
