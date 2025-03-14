@@ -10,13 +10,15 @@ const signToken = (id) =>
   });
 
 exports.signup = catchAsync(async (req, res, next) => {
-  const newUser = await User.create({
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-    passwordConfirm: req.body.passwordConfirm,
-    passwordChangedAt: new Date()
-  });
+  const newUser = await User.create(req.body);
+
+  // const newUser = await User.create({
+  //   name: req.body.name,
+  //   email: req.body.email,
+  //   password: req.body.password,
+  //   passwordConfirm: req.body.passwordConfirm,
+  //   passwordChangedAt: new Date() //TODO: remove this
+  // });
 
   // create JWT token
   const token = signToken(newUser._id);
@@ -81,7 +83,19 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
 
   // GRANT ACCESS TO PROTECTED ROUTE
-  //we pass data trough middlewares by using the 'req' and 'res' objects
+  // we pass data trough middlewares by using the 'req' and 'res' objects
   req.user = currentUser;
   next();
 });
+
+// ...roles creates an array of the roles passed to the middleware
+exports.restrictTo =
+  (...roles) =>
+  (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError('You do not have permission to perform this action', 403)
+      );
+    }
+    next();
+  };

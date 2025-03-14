@@ -58,7 +58,7 @@ const sendErrorProd = (err, res) => {
 // since this function has 4 params, Express knows this is a global error handling middleware
 module.exports = (err, _req, res, next) => {
   //this prints out the stack trace
-  //console.log(err.stack);
+  //console.error(err.stack);
 
   // set default error status code to 500
   err.statusCode = err.statusCode || 500;
@@ -73,10 +73,22 @@ module.exports = (err, _req, res, next) => {
 
     //add more specific error handling here for different operational error types
     if (err.code === 11000) error = handleDuplicateFieldsDB(error);
-    if (err.name === 'CastError') error = handleCastErrorDB(error);
-    if (err.name === 'ValidationError') error = handleValidationErrorDB(error);
-    if (err.name === 'JsonWebTokenError') error = handleJWTError(error);
-    if (err.name === 'TokenExpiredError') error = handleJWTExpiredError(error);
+    switch (err.name) {
+      case 'CastError':
+        error = handleCastErrorDB(error);
+        break;
+      case 'ValidationError':
+        error = handleValidationErrorDB(error);
+        break;
+      case 'JsonWebTokenError':
+        error = handleJWTError(error);
+        break;
+      case 'TokenExpiredError':
+        error = handleJWTExpiredError(error);
+        break;
+      default:
+        break;
+    }
 
     sendErrorProd(error, res);
   }
