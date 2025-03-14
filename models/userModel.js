@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -40,9 +41,12 @@ const userSchema = new mongoose.Schema({
       message: 'Passwords are not the same!'
     }
   },
-  passwordChangedAt: Date
+  passwordChangedAt: Date,
+  passwordResetToken: String,
+  passwordResetExpires: Date
 });
 
+// #region Middlewares
 // password encryption
 userSchema.pre('save', async function (next) {
   // if password has not been modified, call the next middleware function
@@ -56,6 +60,17 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+userSchema.pre('save', function (next) {
+  // if password has not been modified or the document is new, call the next middleware function
+  if (!this.isModified('password') || this.isNew) return next();
+
+  // subtract one second to insure that the token is created AFTER the password has been changed
+  this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
+// #endregion
+
 // instance methods are available on all documents of a certain collection
 // #region Instance Methods
 userSchema.methods.correctPassword = async function (
@@ -65,7 +80,7 @@ userSchema.methods.correctPassword = async function (
   return await bcrypt.compare(candidatePassword, userPassword);
 };
 
-///If user changed password AFTER TOKEN generation
+// If user changed password AFTER TOKEN generation
 userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   if (this.passwordChangedAt) {
     const changedTimestamp = parseInt(
@@ -77,6 +92,18 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
 
   // False means not changed
   return false;
+};
+
+userSchema.methods.createPasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+  return resetToken;
 };
 
 //#endregion
