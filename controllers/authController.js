@@ -6,26 +6,24 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const sendEmail = require('../utils/email');
 
+// #region internal utils
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN
   });
 
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+
+  res.status(statusCode).send({ status: 'success', token, data: { user } });
+};
+// #endregion
+
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create(req.body);
 
-  // const newUser = await User.create({
-  //   name: req.body.name,
-  //   email: req.body.email,
-  //   password: req.body.password,
-  //   passwordConfirm: req.body.passwordConfirm,
-  //   passwordChangedAt: new Date() //TODO: remove this
-  // });
-
   // create JWT token
-  const token = signToken(newUser._id);
-
-  res.status(201).send({ status: 'success', token, data: { user: newUser } });
+  createSendToken(newUser, 201, res);
 });
 
 // #region Authentication
@@ -45,8 +43,7 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   // 3) If everything is correct, generate token and send it to the client
-  const token = signToken(user._id);
-  res.status(200).send({ status: 'success', token: token });
+  createSendToken(user, 200, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -179,8 +176,29 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   // 3) Update changedPasswordAt for current user
 
   // 4) Log the user in (send JWT)
-  const token = signToken(user._id);
-  res.status(200).send({ status: 'success', token: token });
+  createSendToken(user, 200, res);
 });
 
 // #endregion
+
+// # region Change Password (Authenticated users only)
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  // 1) Get user from collection
+  //add the password field to the select, since in the schema it's hidden by default
+  const user = await User.findById(req.user._id).select('+password');
+
+  // 2) Check if POSTed password is correct
+  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+    return next(new AppError('Your current password is wrong!', 401));
+  }
+
+  // 3) If it is, then update the password
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save();
+  // User.findByIdAndUpdate will NOT work as intended!
+
+  // 4) Log the user in (send JWT)
+  createSendToken(user, 200, res);
+});
+// # endregion
