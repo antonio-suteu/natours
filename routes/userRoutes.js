@@ -18,6 +18,8 @@ router.patch(
 );
 
 router.patch('/updateMe', authController.protect, userController.updateMe);
+router.delete('/deleteMe', authController.protect, userController.deleteMe);
+
 // #endregion
 router
   .route('/')

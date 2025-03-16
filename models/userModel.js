@@ -44,6 +44,11 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date
+  // active: {
+  //   type: Boolean,
+  //   default: true,
+  //   select: false //hide the active field to the client
+  // }
 });
 
 // #region Middlewares
@@ -68,6 +73,13 @@ userSchema.pre('save', function (next) {
   this.passwordChangedAt = Date.now() - 1000;
   next();
 });
+
+// 2. QUERY MIDDLEWARE: runs before the query gets executed
+// /^find/ is a regex that matches the strings that start with 'find'
+// userSchema.pre(/^find/, function (next) {
+//   this.find({ active: { $ne: false } });
+//   next();
+// });
 
 // #endregion
 

@@ -55,6 +55,15 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   // 4) Send updated user document
   res.status(200).send({ status: 'success', data: { user: updatedUser } });
 });
+
+exports.deleteMe = catchAsync(async (req, res, next) => {
+  // 1) Delete user document
+  await User.findByIdAndDelete(req.user.id);
+  //await User.findByIdAndUpdate(req.user.id, { active: false });
+
+  // 2) Send a success message
+  res.status(204).send({ status: 'success', data: null });
+});
 // #endregion
 
 exports.getUser = (req, res) => {
