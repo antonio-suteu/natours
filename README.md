@@ -14,8 +14,8 @@ Other Node packages used:
 - - jsonwebtoken (for JWT generation)
 - - bcryptjs (for password encryption and decryption)
 - - express-rate-limit (for IP rate-limiting)
--  -helmet (for adding some security related HTTP headers)
--  -hpp (for preventing parameter pollution)
+- - helmet (for adding some security related HTTP headers)
+- - hpp (for preventing parameter pollution)
 - - express-mongo-sanitize (for data sanitization)
 - - xss-clean (for protection againt Cross-Site scripting)
 
