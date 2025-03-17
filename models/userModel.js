@@ -44,11 +44,12 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
-  failedLoginAttempts: {
-    type: Number,
-    default: 0,
-    select: false //hide the failedLoginAttempts field to the client
-  },
+  failedLoginAttempts: { type: Number, select: false },
+  // failedLoginAttempts: {
+  //   type: Number,
+  //   default: 0,
+  //   select: false //hide the failedLoginAttempts field to the client
+  // },
   lockUntil: { type: Date, select: false }
   // active: {
   //   type: Boolean,
@@ -122,6 +123,11 @@ userSchema.methods.createPasswordResetToken = function () {
   this.passwordResetExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
 
   return resetToken;
+};
+
+userSchema.methods.getFailedLoginAttempts = function () {
+  if (!this.failedLoginAttempts) return 0;
+  return this.failedLoginAttempts;
 };
 
 //#endregion

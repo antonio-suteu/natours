@@ -15,6 +15,19 @@ const signToken = (id) =>
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
 
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    secure: process.env.NODE_ENV === 'production', // only send cookie over https in production
+    httpOnly: true
+  };
+
+  res.cookie('jwt', token, cookieOptions);
+
+  // remove password from output
+  user.password = undefined;
+
   res.status(statusCode).send({ status: 'success', token, data: { user } });
 };
 // #endregion
@@ -43,7 +56,7 @@ exports.login = catchAsync(async (req, res, next) => {
 
   if (!user || !(await user.correctPassword(password, user.password))) {
     // increment failed login attempt counter
-    user.failedLoginAttempts += 1;
+    user.failedLoginAttempts = user.getFailedLoginAttempts() + 1;
     if (user.failedLoginAttempts > 3)
       user.lockUntil = Date.now() + 1 * 60 * 60 * 1000; // 1 hour
     await user.save({ validateBeforeSave: false });
