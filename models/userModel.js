@@ -43,7 +43,13 @@ const userSchema = new mongoose.Schema({
   },
   passwordChangedAt: Date,
   passwordResetToken: String,
-  passwordResetExpires: Date
+  passwordResetExpires: Date,
+  failedLoginAttempts: {
+    type: Number,
+    default: 0,
+    select: false //hide the failedLoginAttempts field to the client
+  },
+  lockUntil: { type: Date, select: false }
   // active: {
   //   type: Boolean,
   //   default: true,

@@ -36,13 +36,36 @@ exports.login = catchAsync(async (req, res, next) => {
   }
   // 2) check if user exists and password is correct
   // when we use select, using + indicates that we want
-  // to include  a previously hidden field to the schema
-  const user = await User.findOne({ email }).select('+password');
+  // to include a previously hidden field to the schema
+  const user = await User.findOne({ email }).select(
+    '+password +failedLoginAttempts +lockUntil'
+  );
+
   if (!user || !(await user.correctPassword(password, user.password))) {
+    // increment failed login attempt counter
+    user.failedLoginAttempts += 1;
+    if (user.failedLoginAttempts > 3)
+      user.lockUntil = Date.now() + 1 * 60 * 60 * 1000; // 1 hour
+    await user.save({ validateBeforeSave: false });
+
     return next(new AppError('Incorrect email or password', 401));
   }
 
-  // 3) If everything is correct, generate token and send it to the client
+  // 3) Check if user is locked out
+  if (user.lockUntil && user.lockUntil > Date.now()) {
+    return next(
+      new AppError(
+        'Your account is locked due to too many failed login attempts.',
+        403
+      )
+    );
+  }
+
+  // 4) Reset failed login attempt counter
+  user.failedLoginAttempts = undefined;
+  await user.save({ validateBeforeSave: false });
+
+  // 5) If everything is correct, generate token and send it to the client
   createSendToken(user, 200, res);
 });
 
