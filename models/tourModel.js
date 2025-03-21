@@ -111,18 +111,27 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
-// virtual properties
+// #region virtual properties
 // we use a regular function because we use 'this' keyword
 // we can't use these properties in queries
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
 
+// create a virtual populate for accessing the tour reviews
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour',
+  localField: '_id'
+});
+
 // tourSchema.virtual('startLocation').get(function () {
 //   return this.locations[0];
 // });
 
-// DOCUMENT MIDDLEWARE: runs before .save() & .create() functions
+// #endregion
+
+// #region DOCUMENT MIDDLEWARE: runs before .save() & .create() functions
 // NOTE: does not work for .saveMany()
 tourSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
@@ -138,6 +147,8 @@ tourSchema.pre('save', function (next) {
 //   console.log('New tour created!', doc);
 //   next();
 // });
+
+// #endregion
 
 // #region QUERY MIDDLEWARE: runs before the query gets executed
 // /^find/ is a regex that matches the strings that start with 'find'
