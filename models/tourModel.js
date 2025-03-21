@@ -65,7 +65,34 @@ const tourSchema = new mongoose.Schema(
     images: [String],
     createdAt: { type: Date, default: Date.now(), select: false }, //select: set to false, it hides from response
     startDates: [Date],
-    secretTour: { type: Boolean, default: false } //Will be used by Query middleware
+    secretTour: { type: Boolean, default: false }, //Will be used by Query middleware
+    // adding geospatial data as GeoJSON object (type and coordinates attributes are required)
+    startLocation: {
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point']
+      },
+      // coordinates are first latitude then longitude
+      // (basically reverse the ones returned by Google Maps)
+      coordinates: [Number],
+      address: String,
+      description: String
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point']
+        },
+        // coordinates are first latitude then longitude
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number //start location would be day 0
+      }
+    ]
   },
   {
     // schema options that allow for virtual properties
@@ -80,6 +107,10 @@ const tourSchema = new mongoose.Schema(
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
+
+// tourSchema.virtual('startLocation').get(function () {
+//   return this.locations[0];
+// });
 
 // #region Type of Mongoose Middlewares
 // 1. DOCUMENT MIDDLEWARE: runs before .save() & .create() functions
