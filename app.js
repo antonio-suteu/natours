@@ -9,8 +9,10 @@ const hpp = require('hpp');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 
+/// routers
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
+const reviewRouter = require('./routes/reviewRoutes');
 
 const app = express();
 
@@ -72,11 +74,10 @@ app.use((req, res, next) => {
 });
 //#endregion
 
-// 2) ROUTES
-// mounting the userRouter
+// 2) MOUNTING ROUTES
 app.use('/api/v1/users', userRouter);
-// mounting the tourRouter
 app.use('/api/v1/tours', tourRouter);
+app.use('/api/v1/reviews', reviewRouter);
 
 // middleware for handling all the HTTP requests with an invalid url
 // PLACE AT THE END OF ROUTES DEFINITION
