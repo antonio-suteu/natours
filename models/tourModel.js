@@ -92,12 +92,22 @@ const tourSchema = new mongoose.Schema(
         description: String,
         day: Number //start location would be day 0
       }
+    ],
+    guides: [
+      //child reference
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+      }
     ]
   },
   {
-    // schema options that allow for virtual properties
+    // SCHEMA OPTIONS
+    // allow for virtual properties
     toJSON: { virtuals: true },
-    toObject: { virtuals: true }
+    toObject: { virtuals: true },
+    // disable schema versioning
+    versionKey: false
   }
 );
 
@@ -112,8 +122,7 @@ tourSchema.virtual('durationWeeks').get(function () {
 //   return this.locations[0];
 // });
 
-// #region Type of Mongoose Middlewares
-// 1. DOCUMENT MIDDLEWARE: runs before .save() & .create() functions
+// DOCUMENT MIDDLEWARE: runs before .save() & .create() functions
 // NOTE: does not work for .saveMany()
 tourSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
@@ -130,12 +139,23 @@ tourSchema.pre('save', function (next) {
 //   next();
 // });
 
-// 2. QUERY MIDDLEWARE: runs before the query gets executed
+// #region QUERY MIDDLEWARE: runs before the query gets executed
 // /^find/ is a regex that matches the strings that start with 'find'
 tourSchema.pre(/^find/, function (next) {
   this.find({ secretTour: { $ne: true } });
 
-  this.queryStart = Date.now();
+  //this.queryStart = Date.now();
+  next();
+});
+
+tourSchema.pre(/^find/, function (next) {
+  // this fills our the guides user data from the arrays of user id's
+  // contained in the 'guides' array
+  this.populate({
+    path: 'guides',
+    select: '-passwordChangedAt'
+  });
+
   next();
 });
 
@@ -145,6 +165,8 @@ tourSchema.pre(/^find/, function (next) {
 //   next();
 // });
 
+// #endregion
+
 // 3. AGGREGATION MIDDLEWARE
 tourSchema.pre('aggregate', function (next) {
   // pipeline() returs the curent pipeline
@@ -153,7 +175,6 @@ tourSchema.pre('aggregate', function (next) {
   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
   next();
 });
-//#endregion
 
 const Tour = mongoose.model('Tour', tourSchema);
 

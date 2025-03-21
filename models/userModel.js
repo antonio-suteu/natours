@@ -3,60 +3,67 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, 'User must have a name']
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, 'User must have a name']
+    },
+    email: {
+      type: String,
+      required: [true, 'User must have an email'],
+      unique: true,
+      lowercase: true, //transform the email to lowerCase
+      validate: [validator.isEmail, 'Please enter a valid email address']
+    },
+    photo: {
+      type: String,
+      default: 'default.jpg'
+    },
+    role: {
+      type: String,
+      enum: ['user', 'guide', 'lead-guide', 'admin'],
+      default: 'user'
+    },
+    password: {
+      type: String,
+      required: [true, 'User must have a password'],
+      minlength: 8,
+      select: false //hide the password field to the client
+    },
+    passwordConfirm: {
+      type: String,
+      required: [true, 'User must confirm password'],
+      validate: {
+        validator: function (val) {
+          // only works on new document (not update)
+          return val === this.password;
+        },
+        message: 'Passwords are not the same!'
+      }
+    },
+    passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
+    failedLoginAttempts: { type: Number, select: false },
+    // failedLoginAttempts: {
+    //   type: Number,
+    //   default: 0,
+    //   select: false //hide the failedLoginAttempts field to the client
+    // },
+    lockUntil: { type: Date, select: false }
+    // active: {
+    //   type: Boolean,
+    //   default: true,
+    //   select: false //hide the active field to the client
+    // }
   },
-  email: {
-    type: String,
-    required: [true, 'User must have an email'],
-    unique: true,
-    lowercase: true, //transform the email to lowerCase
-    validate: [validator.isEmail, 'Please enter a valid email address']
-  },
-  photo: {
-    type: String,
-    default: 'default.jpg'
-  },
-  role: {
-    type: String,
-    enum: ['user', 'guide', 'lead-guide', 'admin'],
-    default: 'user'
-  },
-  password: {
-    type: String,
-    required: [true, 'User must have a password'],
-    minlength: 8,
-    select: false //hide the password field to the client
-  },
-  passwordConfirm: {
-    type: String,
-    required: [true, 'User must confirm password'],
-    validate: {
-      validator: function (val) {
-        // only works on new document (not update)
-        return val === this.password;
-      },
-      message: 'Passwords are not the same!'
-    }
-  },
-  passwordChangedAt: Date,
-  passwordResetToken: String,
-  passwordResetExpires: Date,
-  failedLoginAttempts: { type: Number, select: false },
-  // failedLoginAttempts: {
-  //   type: Number,
-  //   default: 0,
-  //   select: false //hide the failedLoginAttempts field to the client
-  // },
-  lockUntil: { type: Date, select: false }
-  // active: {
-  //   type: Boolean,
-  //   default: true,
-  //   select: false //hide the active field to the client
-  // }
-});
+  {
+    // SCHEMA OPTIONS
+    // disable schema versioning
+    versionKey: false
+  }
+);
 
 // #region Middlewares
 // password encryption
