@@ -17,11 +17,6 @@ exports.aliasTopTours = (req, res, next) => {
 
 //#endregion
 
-exports.createNewTour = catchAsync(async (req, res, next) => {
-  const newTour = await Tour.create(req.body);
-  res.status(201).send({ status: 'success', data: { tour: newTour } });
-});
-
 exports.getAllTours = catchAsync(async (req, res, next) => {
   // EXECUTE QUERY
   const features = new APIFeatures(Tour.find(), req.query)
@@ -47,22 +42,8 @@ exports.getTour = catchAsync(async (req, res, next) => {
   res.status(200).send({ status: 'success', data: { tour } });
 });
 
-exports.updateTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true //this uses the validators declared in the Tour model
-  });
-
-  if (!tour) {
-    return next(new AppError('No tour found with that ID', 404));
-  }
-
-  res.json({
-    status: 'success',
-    data: { tour: tour }
-  });
-});
-
+exports.createNewTour = factory.createOne(Tour);
+exports.updateTour = factory.updateOne(Tour);
 exports.deleteTour = factory.deleteOne(Tour);
 
 exports.getTourStats = catchAsync(async (req, res, next) => {
