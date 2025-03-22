@@ -17,19 +17,9 @@ const filterObj = (obj, ...allowedFields) => {
 exports.createNewUser = (req, res) => {
   res.status(500).json({
     status: 'error',
-    message: 'This route is not implemented yet'
+    message: 'This route is not defined. Plese use /signup insead!'
   });
 };
-
-exports.getAllUsers = catchAsync(async (req, res) => {
-  // EXECUTE QUERY
-  const users = await User.find();
-
-  // SEND RESPONSE
-  res
-    .status(200)
-    .send({ status: 'success', results: users.length, data: { users } });
-});
 
 // #region For the current user
 exports.updateMe = catchAsync(async (req, res, next) => {
@@ -66,13 +56,8 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
 });
 // #endregion
 
-exports.getUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is not implemented yet'
-  });
-};
-
+exports.getUser = factory.getOne(User);
+exports.getAllUsers = factory.getAll(User);
 // Do NOT update passwords with this
 exports.updateUser = factory.updateOne(User);
 exports.deleteUser = factory.deleteOne(User);

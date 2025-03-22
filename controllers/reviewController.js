@@ -1,25 +1,6 @@
 const Review = require('../models/reviewModel');
-const APIFeatures = require('../utils/apiFeatures');
-const catchAsync = require('../utils/catchAsync');
+//const catchAsync = require('../utils/catchAsync');
 const factory = require('./handlerFactory');
-
-exports.getAllReviews = catchAsync(async (req, res, next) => {
-  let filter = {};
-  if (req.params.tourId) filter = { tour: req.params.tourId };
-
-  // EXECUTE QUERY
-  const features = new APIFeatures(Review.find(filter), req.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
-  const reviews = await features.query;
-
-  // SEND RESPONSE
-  res
-    .status(200)
-    .send({ status: 'success', results: reviews.length, data: { reviews } });
-});
 
 exports.setTourUserIds = (req, res, next) => {
   if (!req.body.tour) req.body.tour = req.params.tourId;
@@ -28,5 +9,7 @@ exports.setTourUserIds = (req, res, next) => {
 };
 
 exports.createNewReview = factory.createOne(Review);
+exports.getReview = factory.getOne(Review);
+exports.getAllReviews = factory.getAll(Review);
 exports.updateReview = factory.updateOne(Review);
 exports.deleteReview = factory.deleteOne(Review);
