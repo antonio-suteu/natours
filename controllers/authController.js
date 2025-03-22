@@ -54,7 +54,13 @@ exports.login = catchAsync(async (req, res, next) => {
     '+password +failedLoginAttempts +lockUntil'
   );
 
-  if (!user || !(await user.correctPassword(password, user.password))) {
+  // If email is not in database
+  if (!user) {
+    return next(new AppError('Incorrect email or password', 401));
+  }
+
+  // If email is in database and password is wrong
+  if (!(await user.correctPassword(password, user.password))) {
     // increment failed login attempt counter
     user.failedLoginAttempts = user.getFailedLoginAttempts() + 1;
     if (user.failedLoginAttempts > 3)
