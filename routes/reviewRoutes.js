@@ -5,11 +5,13 @@ const authController = require('../controllers/authController');
 // mergeParams is needed for nested routes to work properly
 const router = express.Router({ mergeParams: true });
 
+// Only authenticated user after this middleware
+router.use(authController.protect);
+
 router
   .route('/')
-  .get(authController.protect, reviewController.getAllReviews)
+  .get(reviewController.getAllReviews)
   .post(
-    authController.protect,
     authController.restrictTo('user'),
     reviewController.setTourUserIds,
     reviewController.createNewReview
@@ -18,7 +20,13 @@ router
 router
   .route('/:id')
   .get(reviewController.getReview)
-  .patch(reviewController.updateReview)
-  .delete(reviewController.deleteReview);
+  .patch(
+    authController.restrictTo('user', 'admin'),
+    reviewController.updateReview
+  )
+  .delete(
+    authController.restrictTo('user', 'admin'),
+    reviewController.deleteReview
+  );
 
 module.exports = router;
