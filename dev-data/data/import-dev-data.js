@@ -2,6 +2,8 @@ const fs = require('fs');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const Tour = require('../../models/tourModel');
+const User = require('../../models/userModel');
+const Review = require('../../models/reviewModel');
 
 // make it possible to access environment variables
 dotenv.config({ path: './config.env' });
@@ -16,13 +18,20 @@ mongoose.connect(connStringDB).then(() => {
 });
 
 // READ JSON FILE
-const dataToImport = fs.readFileSync(`${__dirname}/tours.json`, 'utf-8');
-const dataObjectToImport = JSON.parse(dataToImport);
+const tours = fs.readFileSync(`${__dirname}/tours.json`, 'utf-8');
+const toursObjectToImport = JSON.parse(tours);
+const users = fs.readFileSync(`${__dirname}/users.json`, 'utf-8');
+const usersObjectToImport = JSON.parse(users);
+const reviews = fs.readFileSync(`${__dirname}/reviews.json`, 'utf-8');
+const reviewsObjectToImport = JSON.parse(reviews);
 
 // IMPORT DATA INTO DB
 const importData = async () => {
   try {
-    await Tour.create(dataObjectToImport);
+    await Tour.create(toursObjectToImport);
+    await User.create(usersObjectToImport, { validateBeforeSave: false });
+    await Review.create(reviewsObjectToImport);
+
     console.log('Data imported successfully');
   } catch (error) {
     console.error('Error importing data:', error);
@@ -34,6 +43,8 @@ const importData = async () => {
 const deleteAllData = async () => {
   try {
     await Tour.deleteMany();
+    await User.deleteMany();
+    await Review.deleteMany();
     console.log('Data deleted successfully');
   } catch (error) {
     console.error('Error deleting data:', error);
