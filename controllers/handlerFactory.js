@@ -38,6 +38,11 @@ exports.getAll = (Model) =>
       .paginate();
     const docs = await features.query;
 
+    // const docs = await features.query.explain();
+    // explain is used to analyze query performance
+    // (look for executionStats.nReturned and executionStats.totalDocsExamined)
+    // they should be the same
+
     // SEND RESPONSE
     res.status(200).send({
       status: 'success',

@@ -111,6 +111,13 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
+// #region INDEXES (for requests with more reads than writes)
+// compound index (works for the individual fields too)
+// when we update the document, the index also has to be updated
+tourSchema.index({ price: 1, ratingsAverage: -1 });
+tourSchema.index({ slug: 1 });
+// #endregion
+
 // #region virtual properties
 // we use a regular function because we use 'this' keyword
 // we can't use these properties in queries
