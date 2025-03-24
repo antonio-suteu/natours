@@ -55,14 +55,30 @@ reviewSchema.statics.calcAverageRatings = async function (tourId) {
   ]);
 
   //Update tour with calculated review stats
-  await Tour.findByIdAndUpdate(stats[0]._id, {
-    ratingsQuantity: stats[0].nReviews,
-    ratingsAverage: stats[0].avgRating
-  });
+  if (stats.length > 0) {
+    await Tour.findByIdAndUpdate(stats[0]._id, {
+      ratingsQuantity: stats[0].nReviews,
+      ratingsAverage: stats[0].avgRating
+    });
+  } else {
+    // if there are no reviews for this tour, set the ratingsQuantity and ratingsAverage to 4.5
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: 0,
+      ratingsAverage: 4.5
+    });
+  }
 };
 // #endregion
 
-// #region QUERY MIDDLEWARES
+// #region DOCUMENT MIDDLEWARES
+// this triggers when we create, delete or update a review document
+reviewSchema.post(/save|^findOneAnd/, async (doc, next) => {
+  await doc.constructor.calcAverageRatings(doc.tour);
+  next();
+});
+// #endregion
+
+// #region QUERY MIDDLEWARES (this is for the current query)
 reviewSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'user',
@@ -71,15 +87,16 @@ reviewSchema.pre(/^find/, function (next) {
 
   next();
 });
-// #endregion
 
-// #region DOCUMENT MIDDLEWARES
+// ^findOneAnd mathes update and delete
+// Tour.findOneAndUpdate
+// Tour.findOneAndDelete
+// reviewSchema.pre(/^findOneAnd/, async function (next) {
+//   const review = await this.findOne(); //we execute the query in order to get the document
+//   this.constructor.calcAverageRatings(review.tour);
+//   next();
+// });
 
-reviewSchema.post('save', function () {
-  // this points to current review
-  // mongoose.model('Review') gives us access to the Review model
-  this.constructor.calcAverageRatings(this.tour);
-});
 // #endregion
 
 const Review = mongoose.model('Review', reviewSchema);
