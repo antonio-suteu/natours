@@ -43,7 +43,8 @@ const tourSchema = new mongoose.Schema(
       type: Number,
       default: 4.5,
       min: [1, 'Rating must be between 1 and 5'], //also works with Dates
-      max: [5, 'Rating must be between 1 and 5'] //also works with Dates
+      max: [5, 'Rating must be between 1 and 5'], //also works with Dates
+      set: (val) => Math.round(val * 10) / 10 //Round up to one decimal point
     },
     ratingsQuantity: { type: Number, default: 0 },
     price: { type: Number, required: [true, 'A tour must have a price'] },

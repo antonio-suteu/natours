@@ -38,6 +38,11 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
+// #region INDEXES (always after Schema definition)
+// each combination of tour and user has to be unique
+reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
+// #endregion
+
 // #region Static Methods (they operate on the entire collection)
 reviewSchema.statics.calcAverageRatings = async function (tourId) {
   // this keyword refers to the model itself (Review)
@@ -76,27 +81,15 @@ reviewSchema.post(/save|^findOneAnd/, async (doc, next) => {
   await doc.constructor.calcAverageRatings(doc.tour);
   next();
 });
-// #endregion
 
-// #region QUERY MIDDLEWARES (this is for the current query)
 reviewSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'user',
-    select: 'name'
+    select: 'name photo'
   });
 
   next();
 });
-
-// ^findOneAnd mathes update and delete
-// Tour.findOneAndUpdate
-// Tour.findOneAndDelete
-// reviewSchema.pre(/^findOneAnd/, async function (next) {
-//   const review = await this.findOne(); //we execute the query in order to get the document
-//   this.constructor.calcAverageRatings(review.tour);
-//   next();
-// });
-
 // #endregion
 
 const Review = mongoose.model('Review', reviewSchema);
