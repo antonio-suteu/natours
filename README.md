@@ -2,9 +2,9 @@
 - Authorization & Authentication (JWT)
 - Users can book tours & leave reviews
 - Administrators can edit/delete reviews
-- - Tour statistics
--  number of tours for each month in a given year,
--  grouping by tour difficulty
+-  Tour statistics
+- - number of tours for each month in a given year,
+- - grouping by tour difficulty
 -  top 5 tours
 
 Stack:
