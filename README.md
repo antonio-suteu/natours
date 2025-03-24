@@ -11,7 +11,7 @@ Stack:
 - Express.js
 - Mongoose
 
-DataBase:
+Database:
 - MongoDB
 
 Other Node packages used:
