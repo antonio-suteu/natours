@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Tour = require('./tourModel');
 
 const reviewSchema = new mongoose.Schema(
   {
@@ -37,8 +38,31 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
-// #region QUERY MIDDLEWARES
+// #region Static Methods (they operate on the entire collection)
+reviewSchema.statics.calcAverageRatings = async function (tourId) {
+  // this keyword refers to the model itself (Review)
+  // calculate review stats for the tour
+  const stats = await this.aggregate([
+    { $match: { tour: tourId } }, //select all the reviews of a given tour
+    {
+      // group by tour id (in this case there will be multiple reviews with the same tourId)
+      $group: {
+        _id: '$tour',
+        nReviews: { $sum: 1 }, // count all the reviews of a given tour
+        avgRating: { $avg: '$rating' } // calculate the average rating
+      }
+    }
+  ]);
 
+  //Update tour with calculated review stats
+  await Tour.findByIdAndUpdate(stats[0]._id, {
+    ratingsQuantity: stats[0].nReviews,
+    ratingsAverage: stats[0].avgRating
+  });
+};
+// #endregion
+
+// #region QUERY MIDDLEWARES
 reviewSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'user',
@@ -46,6 +70,15 @@ reviewSchema.pre(/^find/, function (next) {
   });
 
   next();
+});
+// #endregion
+
+// #region DOCUMENT MIDDLEWARES
+
+reviewSchema.post('save', function () {
+  // this points to current review
+  // mongoose.model('Review') gives us access to the Review model
+  this.constructor.calcAverageRatings(this.tour);
 });
 // #endregion
 
