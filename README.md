@@ -5,7 +5,7 @@
 -  Tour statistics
 - - number of tours for each month in a given year,
 - - grouping by tour difficulty
--  top 5 tours
+- - top 5 tours (based on average rating)
 
 Stack:
 - Express.js
