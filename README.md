@@ -4,7 +4,7 @@
 - Administrators can edit/delete reviews
 -  Tour statistics
 - - number of tours for each month in a given year,
-- - grouping by tour difficulty
+- - average rating, duration & price (grouped by tour difficulty)
 - - top 5 tours (based on average rating)
 
 Stack:
