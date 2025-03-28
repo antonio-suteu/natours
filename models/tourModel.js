@@ -189,13 +189,13 @@ tourSchema.pre(/^find/, function (next) {
 // #endregion
 
 // 3. AGGREGATION MIDDLEWARE
-tourSchema.pre('aggregate', function (next) {
-  // pipeline() returs the curent pipeline
-  // unshift() adds a new stage to the beginning of the pipeline
-  // $match stage filters the documents to only include those where the secretTour field is not true
-  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
-  next();
-});
+// tourSchema.pre('aggregate', function (next) {
+//   // pipeline() returs the curent pipeline
+//   // unshift() adds a new stage to the beginning of the pipeline
+//   // $match stage filters the documents to only include those where the secretTour field is not true
+//   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+//   next();
+// });
 
 const Tour = mongoose.model('Tour', tourSchema);
 

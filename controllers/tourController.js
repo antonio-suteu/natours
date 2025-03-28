@@ -132,3 +132,50 @@ exports.getToursWithin = catchAsync(async (req, res, next) => {
     }
   });
 });
+
+// Returns the distance between a given location and all the tours
+exports.getDistances = catchAsync(async (req, res, next) => {
+  const { latlng, unit } = req.params;
+  const [lat, lng] = latlng.split(',');
+
+  //#region controls
+  //check valid coordinates
+  if (!lat || !lng) {
+    return next(
+      new AppError(
+        'Please provide latitude and longitude in the format lat,lng.',
+        400
+      )
+    );
+  }
+
+  // check valid unit
+  if (!['km', 'mi'].includes(unit)) {
+    return next(new AppError('Unit must be either km or mi.', 400));
+  }
+
+  //#endregion
+
+  //... calculate distances and return them
+  const multiplier = unit === 'mi' ? 0.000621371 : 0.001;
+
+  const distances = await Tour.aggregate([
+    {
+      // it needs an index in order to work,
+      // if we have only one geospatial index, it will use that one
+      $geoNear: {
+        near: { type: 'Point', coordinates: [lng * 1, lat * 1] },
+        distanceField: 'distance',
+        distanceMultiplier: multiplier
+      }
+    },
+    { $project: { distance: 1, name: 1 } }
+  ]);
+
+  res.status(200).send({
+    status: 'success',
+    data: {
+      distances
+    }
+  });
+});
