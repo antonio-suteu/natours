@@ -117,6 +117,8 @@ const tourSchema = new mongoose.Schema(
 // when we update the document, the index also has to be updated
 tourSchema.index({ price: 1, ratingsAverage: -1 });
 tourSchema.index({ slug: 1 });
+// needed for geospatial queries
+tourSchema.index({ startLocation: '2dsphere' });
 // #endregion
 
 // #region virtual properties

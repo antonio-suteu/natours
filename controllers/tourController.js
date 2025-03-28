@@ -1,4 +1,5 @@
 const Tour = require('../models/tourModel');
+const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const factory = require('./handlerFactory');
 
@@ -15,6 +16,16 @@ exports.aliasTopTours = (req, res, next) => {
 
 //#endregion
 
+exports.createNewTour = factory.createOne(Tour);
+exports.getTour = factory.getOne(Tour, {
+  path: 'reviews',
+  select: 'review rating user'
+});
+exports.getAllTours = factory.getAll(Tour);
+exports.updateTour = factory.updateOne(Tour);
+exports.deleteTour = factory.deleteOne(Tour);
+
+// Returns some stats of the tours grouped by difficulty level
 exports.getTourStats = catchAsync(async (req, res, next) => {
   const stats = await Tour.aggregate([
     { $match: { ratingsAverage: { $gte: 4.5 } } }, // only consider tours with a ratings of at least 4.5
@@ -72,11 +83,52 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
   res.status(200).send({ status: 'success', data: { plan } });
 });
 
-exports.createNewTour = factory.createOne(Tour);
-exports.getTour = factory.getOne(Tour, {
-  path: 'reviews',
-  select: 'review rating user'
+// Returns tours that fall within a given distance from a given coordinates
+// /tours-within/:distance/from/:latlng/unit/:unit')
+// /tours-within/100/from/33.959346014448734, -118.34946466016014/unit/km')
+exports.getToursWithin = catchAsync(async (req, res, next) => {
+  const { distance, latlng, unit } = req.params;
+  const [lat, lng] = latlng.split(',');
+
+  // #region controls
+  // check valid distance
+  const parsedDistance = distance * 1;
+  if (Number.isNaN(parsedDistance) || parsedDistance <= 0) {
+    return next(new AppError('Distance must be a positive number.', 400));
+  }
+
+  //check valid coordinates
+  if (!lat || !lng) {
+    return next(
+      new AppError(
+        'Please provide latitude and longitude in the format lat,lng.',
+        400
+      )
+    );
+  }
+
+  // check valid unit
+  if (!['km', 'mi'].includes(unit)) {
+    return next(new AppError('Unit must be either km or mi.', 400));
+  }
+  // #endregion
+
+  // calculate radiants (distance divided by Earth radius)
+  const radius =
+    unit === 'km' ? parsedDistance / 6378.1 : parsedDistance / 3963.2;
+
+  const tours = await Tour.find({
+    startLocation: {
+      //$geoWithin: { $geometry: { type: 'Point', coordinetes: [lat, lng] } }
+      $geoWithin: { $centerSphere: [[lng, lat], radius] }
+    }
+  });
+
+  res.status(200).send({
+    status: 'success',
+    results: tours.length,
+    data: {
+      tours
+    }
+  });
 });
-exports.getAllTours = factory.getAll(Tour);
-exports.updateTour = factory.updateOne(Tour);
-exports.deleteTour = factory.deleteOne(Tour);
