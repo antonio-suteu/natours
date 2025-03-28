@@ -2,6 +2,7 @@
 - Authorization & Authentication (JWT)
 - Users can book tours & leave reviews
 - Administrators can edit/delete reviews
+- Discover tours that begin within a specified location and radius
 -  Tour statistics
 - - number of tours for each month in a given year,
 - - average rating, duration & price (grouped by tour difficulty)
