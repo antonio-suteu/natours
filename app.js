@@ -27,6 +27,7 @@ app.set('views', path.join(__dirname, 'views'));
 // #region GLOBAL MIDDLEWARES
 
 // Serving static files
+// the 'public' folder is the root of our base pug template
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Set Security HTTP headers
@@ -86,7 +87,10 @@ app.use((req, res, next) => {
 // 2) MOUNTING ROUTES
 // needed for server side rendering, each HTTP GET response gets converted into HTML
 app.get('/', (req, res) => {
-  res.status(200).render('base');
+  res.status(200).render('base', {
+    tour: 'The Forest Hiker',
+    user: 'Test User'
+  });
 });
 
 app.use('/api/v1/users', userRouter);
