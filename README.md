@@ -1,3 +1,6 @@
+([Click here to read the API Documentation](https://documenter.getpostman.com/view/34634720/2sB2cPjRHa))
+
+
 **Features:**
 - Authorization & Authentication (JWT)
 - Users can book tours & leave reviews
@@ -11,6 +14,7 @@
 Stack:
 - Express.js
 - Mongoose
+- Pug
 
 Database:
 - MongoDB
