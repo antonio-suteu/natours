@@ -11,6 +11,8 @@
 - - average rating, duration & price (grouped by tour difficulty)
 - - top 5 tours (based on average rating)
 
+Architecture: MVC
+
 Stack:
 - Express.js
 - Mongoose
