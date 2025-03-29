@@ -12,6 +12,7 @@
 - - top 5 tours (based on average rating)
 
 Architecture: MVC
+CSS: https://cssguidelin.es/#bem-like-naming
 
 Stack:
 - Express.js
