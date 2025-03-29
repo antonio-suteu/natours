@@ -1172,6 +1172,11 @@ body {
   grid-row-gap: 1rem;
   margin-top: auto;
 }
+
+.card__footer p span:last-child {
+  margin-left: 0.5rem
+}
+
 .card__footer-value {
   font-weight: 700;
 }
