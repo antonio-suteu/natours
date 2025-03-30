@@ -19,7 +19,7 @@ exports.getTour = catchAsync(async (req, res, next) => {
     fields: 'review rating user'
   });
 
-  // 3) Render that template using tour data from 1)
+  // 2) Render that template using tour data from 1)
   res.status(200).render('tour', {
     tour
   });
