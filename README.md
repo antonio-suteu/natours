@@ -27,7 +27,7 @@ Other Node packages used:
 - morgan (an HTTP request logger middleware for Node.js)
 - validator (a library of string validators and sanitizers)
 - slugify (for string slugification)
-- parcel (for front end script bundling)
+- esbuild (for front end script bundling)
 -  **SECURITY RELATED**
 - - jsonwebtoken (for JWT generation)
 - - bcryptjs (for password encryption and decryption)
