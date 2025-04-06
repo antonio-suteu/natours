@@ -4,7 +4,6 @@ console.warn('login.js');
 
 //login function that call api
 const login = async (email, password) => {
-  console.log(email, password);
   try {
     const res = await axios({
       method: 'POST',
@@ -12,10 +11,14 @@ const login = async (email, password) => {
       data: { email, password }
     });
     console.log(res.data);
+    if (res.data.status === 'success') {
+      // Redirect to home page
+      window.setTimeout(() => {
+        location.assign('/');
+      }, 500);
+    }
   } catch (err) {
-    console.error(err.response.data);
-    // show error message on UI
-    // document.getElementById('error').textContent = err.response.data.message;
+    alert(err.response.data.message);
   }
 };
 
