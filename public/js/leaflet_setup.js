@@ -3,7 +3,7 @@ const locations = JSON.parse(document.getElementById('map').dataset.locations);
 //console.log(locations);
 
 // Leaflet Map initialization
-var map = L.map('map', { zoomControl: false });
+var map = L.map('map', { zoomControl: false, dragging: false });
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution:
