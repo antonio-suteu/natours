@@ -1338,3 +1338,26 @@ body {
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none;  /* IE 10+ */
 }
+
+/* Leaflet custom css */
+.custom-div-icon .marker-pin {
+  background-color: #3c8dbc;
+  color: white;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  font-weight: bold;
+  box-shadow: 0 0 2px #555;
+  font-size: 1.5rem;
+}
+
+.leaflet-popup-content {
+  font-size: 13px !important;
+  font-weight: bold;
+}
+
+.leaflet-popup-content p span {
+  color: #2e864b;
+}
