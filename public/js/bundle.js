@@ -2551,7 +2551,6 @@
         url: "http://localhost:8000/api/v1/users/login",
         data: { email, password }
       });
-      console.log(res.data);
       if (res.data.status === "success") {
         showAlert("success", "Logged in successfully!");
         window.setTimeout(() => {
@@ -2562,10 +2561,22 @@
       showAlert("error", err.response.data.message);
     }
   };
+  var logout = async () => {
+    try {
+      const res = await axios_default({
+        method: "GET",
+        url: "http://localhost:8000/api/v1/users/logout"
+      });
+      if (res.data.status === "success") location.reload(true);
+    } catch (err) {
+      showAlert("error", "Error logging out! Try again");
+    }
+  };
 
   // public/js/index.js
   var mapContainer = document.getElementById("map");
   var loginForm = document.querySelector(".form");
+  var logOutBtn = document.querySelector(".nav__el--logout");
   if (mapContainer) {
     const locations = JSON.parse(mapContainer.dataset.locations);
     displayMap(locations);
@@ -2577,5 +2588,8 @@
       const password = document.getElementById("password").value;
       login(email, password);
     });
+  }
+  if (logOutBtn) {
+    logOutBtn.addEventListener("click", logout);
   }
 })();

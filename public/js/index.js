@@ -1,11 +1,12 @@
 /*eslint-disable */
 
 import { displayMap } from './leaflet_setup';
-import { login } from './login';
+import { login, logout } from './login';
 
 // DOM ELEMENTS
 const mapContainer = document.getElementById('map');
 const loginForm = document.querySelector('.form');
+const logOutBtn = document.querySelector('.nav__el--logout');
 
 // VALUES
 // how about this
@@ -24,4 +25,8 @@ if (loginForm) {
     const password = document.getElementById('password').value;
     login(email, password);
   });
+}
+
+if (logOutBtn) {
+  logOutBtn.addEventListener('click', logout);
 }

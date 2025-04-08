@@ -8,7 +8,6 @@ export const login = async (email, password) => {
       url: 'http://localhost:8000/api/v1/users/login',
       data: { email, password }
     });
-    console.log(res.data);
     if (res.data.status === 'success') {
       showAlert('success', 'Logged in successfully!');
 
@@ -19,5 +18,18 @@ export const login = async (email, password) => {
     }
   } catch (err) {
     showAlert('error', err.response.data.message);
+  }
+};
+
+export const logout = async () => {
+  try {
+    const res = await axios({
+      method: 'GET',
+      url: 'http://localhost:8000/api/v1/users/logout'
+    });
+
+    if (res.data.status === 'success') location.reload(true); //true forces reload from server
+  } catch (err) {
+    showAlert('error', 'Error logging out! Try again');
   }
 };
