@@ -26,37 +26,63 @@ const handleJWTExpiredError = (val) =>
 
 //#endregion
 
-const sendErrorDev = (err, res) => {
-  res.status(err.statusCode).json({
-    status: err.status,
-    error: err,
-    message: err.message,
-    stack: err.stack
+const sendErrorDev = (err, req, res) => {
+  // A) API
+  if (req.originalUrl.startsWith('/api')) {
+    return res.status(err.statusCode).json({
+      status: err.status,
+      error: err,
+      message: err.message,
+      stack: err.stack
+    });
+  }
+
+  // B) Rendered website
+  return res.status(err.statusCode).render('error', {
+    title: 'Something went wrong!',
+    msg: err.message
   });
 };
 
-const sendErrorProd = (err, res) => {
-  // Operational, trusted error: send message to client
-  if (err.isOperational) {
-    res.status(err.statusCode).json({
-      status: err.status,
-      message: err.message
-    });
-
+const sendErrorProd = (err, req, res) => {
+  // #region A) API
+  if (req.originalUrl.startsWith('/api')) {
+    // Operational, trusted error: send message to client
+    if (err.isOperational) {
+      return res.status(err.statusCode).json({
+        status: err.status,
+        message: err.message
+      });
+    }
     // Programming or other unknown error: don't leak sensitive information
-  } else {
     // 1) Log the error message
     console.error('ERROR 💣', err);
     // 2) Send generic message to client
-    res.status(500).json({
+    return res.status(500).json({
       status: 'error',
       message: 'Something went wrong, please try again later'
     });
   }
+  // #endregion
+
+  // #region B) Rendered website
+  if (err.isOperational) {
+    return res.status(err.statusCode).render('error', {
+      title: 'Something went wrong!',
+      msg: err.message
+    });
+  }
+
+  // Programming or other unknown error: don't leak sensitive information
+  return res.status(err.statusCode).render('error', {
+    title: 'Something went wrong!',
+    msg: 'Please try again later.'
+  });
+  // #endregion
 };
 
 // since this function has 4 params, Express knows this is a global error handling middleware
-module.exports = (err, _req, res, next) => {
+module.exports = (err, req, res, next) => {
   //this prints out the stack trace
   //console.error(err.stack);
 
@@ -66,7 +92,7 @@ module.exports = (err, _req, res, next) => {
 
   if (process.env.NODE_ENV === 'development') {
     //complete error
-    sendErrorDev(err, res);
+    sendErrorDev(err, req, res);
   } else if (process.env.NODE_ENV === 'production') {
     // make a hard copy of the err object
     let error = { ...err, message: err.message };
@@ -90,7 +116,7 @@ module.exports = (err, _req, res, next) => {
         break;
     }
 
-    sendErrorProd(error, res);
+    sendErrorProd(error, req, res);
   }
   next();
 };
