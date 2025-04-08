@@ -138,6 +138,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   // GRANT ACCESS TO PROTECTED ROUTE
   // we pass data trough middlewares by using the 'req' and 'res' objects
   req.user = currentUser;
+  res.locals.user = currentUser; // for providing access to all the pug templates
   next();
 });
 
