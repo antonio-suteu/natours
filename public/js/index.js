@@ -4,11 +4,11 @@ import { displayMap } from './leaflet_setup';
 import { login } from './login';
 
 // DOM ELEMENTS
-// for not
 const mapContainer = document.getElementById('map');
 const loginForm = document.querySelector('.form');
 
 // VALUES
+// how about this
 
 // DELEGATION
 if (mapContainer) {

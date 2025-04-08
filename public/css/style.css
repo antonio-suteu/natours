@@ -88,9 +88,8 @@ body {
 
 .alert {
   position: fixed;
-  top: 0;
+  top: 2rem;
   left: 50%;
-  -webkit-transform: translateX(-50%);
   transform: translateX(-50%);
   z-index: 9999;
   color: #fff;
@@ -99,16 +98,39 @@ body {
   text-align: center;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
-  padding: 1.6rem 15rem;
-  -webkit-box-shadow: 0 2rem 4rem rgba(0, 0, 0, 0.25);
+  padding: 1.6rem 4rem;
+  max-width: 90%;
+  box-sizing: border-box;
   box-shadow: 0 2rem 4rem rgba(0, 0, 0, 0.25);
+  opacity: 1;
+  transition: opacity 0.5s ease, transform 0.5s ease;
 }
+
 .alert--success {
   background-color: #20bf6b;
 }
+
 .alert--error {
   background-color: #eb4d4b;
 }
+
+.alert--hidden {
+  opacity: 0;
+  transform: translateX(-50%) translateY(-2rem);
+  pointer-events: none;
+}
+
+.alert__close {
+  position: absolute;
+  right: 1.5rem;
+  top: 1rem;
+  font-size: 2rem;
+  color: #fff;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
 
 .heading-secondary {
   font-size: 2.25rem;

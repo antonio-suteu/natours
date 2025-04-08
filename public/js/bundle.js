@@ -33,6 +33,30 @@
     map.scrollWheelZoom.disable();
   };
 
+  // public/js/alerts.js
+  var showAlert = (type, msg) => {
+    hideAlert();
+    const markup = `
+    <div class="alert alert--${type}">
+      <span class="alert__text">${msg}</span>
+      <button class="alert__close">&times;</button>
+    </div>`;
+    document.querySelector("body").insertAdjacentHTML("afterbegin", markup);
+    const alertEl = document.querySelector(".alert");
+    window.setTimeout(() => {
+      alertEl.classList.remove("alert--hidden");
+    }, 10);
+    alertEl.querySelector(".alert__close").addEventListener("click", hideAlert);
+    window.setTimeout(() => {
+      alertEl.classList.add("alert--hidden");
+      window.setTimeout(hideAlert, 500);
+    }, 5e3);
+  };
+  var hideAlert = () => {
+    const el = document.querySelector(".alert");
+    if (el) el.parentElement.removeChild(el);
+  };
+
   // node_modules/axios/lib/helpers/bind.js
   function bind(fn, thisArg) {
     return function wrap() {
@@ -2529,12 +2553,13 @@
       });
       console.log(res.data);
       if (res.data.status === "success") {
+        showAlert("success", "Logged in successfully!");
         window.setTimeout(() => {
           location.assign("/");
         }, 500);
       }
     } catch (err) {
-      alert(err.response.data.message);
+      showAlert("error", err.response.data.message);
     }
   };
 
