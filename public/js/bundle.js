@@ -2573,10 +2573,31 @@
     }
   };
 
+  // public/js/updateSettings.js
+  var updateUserData = async (name, email) => {
+    try {
+      const res = await axios_default({
+        method: "PATCH",
+        url: "http://localhost:8000/api/v1/users/updateMe",
+        data: {
+          name,
+          email
+        }
+      });
+      if (res.data.status === "success") {
+        showAlert("success", "Data updated successfully!");
+      }
+    } catch (err) {
+      showAlert("error", err.response.data.message);
+    }
+  };
+
   // public/js/index.js
-  var mapContainer = document.getElementById("map");
-  var loginForm = document.querySelector(".form");
-  var logOutBtn = document.querySelector(".nav__el--logout");
+  var $ = document.querySelector.bind(document);
+  var mapContainer = $("#map");
+  var loginForm = $(".form");
+  var logOutBtn = $(".nav__el--logout");
+  var userDataForm = $(".form-user-data");
   if (mapContainer) {
     const locations = JSON.parse(mapContainer.dataset.locations);
     displayMap(locations);
@@ -2584,12 +2605,20 @@
   if (loginForm) {
     loginForm.addEventListener("submit", (e) => {
       e.preventDefault();
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
+      const email = $("#email").value;
+      const password = $("#password").value;
       login(email, password);
     });
   }
   if (logOutBtn) {
     logOutBtn.addEventListener("click", logout);
+  }
+  if (userDataForm) {
+    userDataForm.addEventListener("click", (e) => {
+      e.preventDefault();
+      const name = $("#name").value;
+      const email = $("#email").value;
+      updateUserData(name, email);
+    });
   }
 })();
