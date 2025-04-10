@@ -2,18 +2,18 @@
 
 import { displayMap } from './leaflet_setup';
 import { login, logout } from './login';
-import { updateUserData } from './updateSettings';
+import { updateSettings } from './updateSettings';
 
 const $ = document.querySelector.bind(document);
 
 // DOM ELEMENTS
 const mapContainer = $('#map');
-const loginForm = $('.form');
+const loginForm = $('.form-login');
 const logOutBtn = $('.nav__el--logout');
-const userDataForm = $('.form-user-data');
+const saveUserDataForm = $('.form-user-data');
+const savePasswordForm = $('.form-user-settings');
 
 // VALUES
-// how about this
 
 // DELEGATION
 if (mapContainer) {
@@ -34,11 +34,39 @@ if (loginForm) {
 if (logOutBtn) {
   logOutBtn.addEventListener('click', logout);
 }
-if (userDataForm) {
-  userDataForm.addEventListener('click', (e) => {
+
+if (saveUserDataForm) {
+  saveUserDataForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const name = $('#name').value;
     const email = $('#email').value;
-    updateUserData(name, email);
+    updateSettings({ name, email }, 'data');
+  });
+}
+
+if (savePasswordForm) {
+  savePasswordForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const savePasswordBtn = $('#updateUserPwdBtn');
+    const passwordCurrent = $('#password-current').value;
+    const password = $('#password').value;
+    const passwordConfirm = $('#password-confirm').value;
+
+    // Change text on button while processing
+    savePasswordBtn.textContent = 'Updating...';
+
+    await updateSettings(
+      { passwordCurrent, password, passwordConfirm },
+      'password'
+    );
+
+    // Clear input fields
+    $('#password-current').value = '';
+    $('#password').value = '';
+    $('#password-confirm').value = '';
+
+    // Reset button text
+    savePasswordBtn.textContent = 'Save password';
   });
 }

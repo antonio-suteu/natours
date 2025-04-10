@@ -1,20 +1,18 @@
 /*eslint-disable */
 import { showAlert } from './alerts';
 import axios from 'axios';
-// update data
-export const updateUserData = async (name, email) => {
+
+// type can be either 'data' or 'password'
+export const updateSettings = async (data, type) => {
   try {
     const res = await axios({
       method: 'PATCH',
-      url: 'http://localhost:8000/api/v1/users/updateMe',
-      data: {
-        name,
-        email
-      }
+      url: `http://localhost:8000/api/v1/users/${type === 'data' ? 'updateMe' : 'updateMyPassword'}`,
+      data
     });
 
     if (res.data.status === 'success') {
-      showAlert('success', 'Data updated successfully!');
+      showAlert('success', `${type} updated successfully!`);
     }
   } catch (err) {
     showAlert('error', err.response.data.message);

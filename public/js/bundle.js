@@ -2574,18 +2574,15 @@
   };
 
   // public/js/updateSettings.js
-  var updateUserData = async (name, email) => {
+  var updateSettings = async (data, type) => {
     try {
       const res = await axios_default({
         method: "PATCH",
-        url: "http://localhost:8000/api/v1/users/updateMe",
-        data: {
-          name,
-          email
-        }
+        url: `http://localhost:8000/api/v1/users/${type === "data" ? "updateMe" : "updateMyPassword"}`,
+        data
       });
       if (res.data.status === "success") {
-        showAlert("success", "Data updated successfully!");
+        showAlert("success", `${type} updated successfully!`);
       }
     } catch (err) {
       showAlert("error", err.response.data.message);
@@ -2595,9 +2592,10 @@
   // public/js/index.js
   var $ = document.querySelector.bind(document);
   var mapContainer = $("#map");
-  var loginForm = $(".form");
+  var loginForm = $(".form-login");
   var logOutBtn = $(".nav__el--logout");
-  var userDataForm = $(".form-user-data");
+  var saveUserDataForm = $(".form-user-data");
+  var savePasswordForm = $(".form-user-settings");
   if (mapContainer) {
     const locations = JSON.parse(mapContainer.dataset.locations);
     displayMap(locations);
@@ -2613,12 +2611,30 @@
   if (logOutBtn) {
     logOutBtn.addEventListener("click", logout);
   }
-  if (userDataForm) {
-    userDataForm.addEventListener("click", (e) => {
+  if (saveUserDataForm) {
+    saveUserDataForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const name = $("#name").value;
       const email = $("#email").value;
-      updateUserData(name, email);
+      updateSettings({ name, email }, "data");
+    });
+  }
+  if (savePasswordForm) {
+    savePasswordForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const savePasswordBtn = $("#updateUserPwdBtn");
+      const passwordCurrent = $("#password-current").value;
+      const password = $("#password").value;
+      const passwordConfirm = $("#password-confirm").value;
+      savePasswordBtn.textContent = "Updating...";
+      await updateSettings(
+        { passwordCurrent, password, passwordConfirm },
+        "password"
+      );
+      $("#password-current").value = "";
+      $("#password").value = "";
+      $("#password-confirm").value = "";
+      savePasswordBtn.textContent = "Save password";
     });
   }
 })();

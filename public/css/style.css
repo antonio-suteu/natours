@@ -87,6 +87,7 @@ body {
 }
 
 .alert {
+  text-transform: capitalize;
   position: fixed;
   top: 2rem;
   left: 50%;
