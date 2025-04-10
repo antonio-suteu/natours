@@ -1,4 +1,4 @@
-([Click here to read the API Documentation](https://documenter.getpostman.com/view/34634720/2sB2cPjRHa))
+([Click here to read the API Documentation](https://documenter.getpostman.com/view/15318955/2sB2cYbfVb))
 
 
 **Features:**
