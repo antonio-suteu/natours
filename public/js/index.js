@@ -36,11 +36,33 @@ if (logOutBtn) {
 }
 
 if (saveUserDataForm) {
-  saveUserDataForm.addEventListener('submit', (e) => {
+  saveUserDataForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const name = $('#name').value;
-    const email = $('#email').value;
-    updateSettings({ name, email }, 'data');
+    // const name = $('#name').value;
+    // const email = $('#email').value;
+    // updateSettings({ name, email }, 'data');
+
+    // Create a FormData object to handle file uploads
+    const form = new FormData();
+    form.append('name', $('#name').value);
+    form.append('email', $('#email').value);
+
+    // Handle photo upload if a file was selected
+    const photoInput = $('#photo');
+    if (photoInput.files.length > 0) {
+      form.append('photo', photoInput.files[0]);
+    }
+
+    // Show loading state
+    const saveButton = $('#saveUserDataBtn');
+    saveButton.textContent = 'Saving...';
+
+    try {
+      await updateSettings(form, 'data');
+      saveButton.textContent = 'Save settings';
+    } catch (err) {
+      saveButton.textContent = 'Save settings';
+    }
   });
 }
 

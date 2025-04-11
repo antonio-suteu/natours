@@ -2612,11 +2612,23 @@
     logOutBtn.addEventListener("click", logout);
   }
   if (saveUserDataForm) {
-    saveUserDataForm.addEventListener("submit", (e) => {
+    saveUserDataForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const name = $("#name").value;
-      const email = $("#email").value;
-      updateSettings({ name, email }, "data");
+      const form = new FormData();
+      form.append("name", $("#name").value);
+      form.append("email", $("#email").value);
+      const photoInput = $("#photo");
+      if (photoInput.files.length > 0) {
+        form.append("photo", photoInput.files[0]);
+      }
+      const saveButton = $("#saveUserDataBtn");
+      saveButton.textContent = "Saving...";
+      try {
+        await updateSettings(form, "data");
+        saveButton.textContent = "Save settings";
+      } catch (err) {
+        saveButton.textContent = "Save settings";
+      }
     });
   }
   if (savePasswordForm) {
