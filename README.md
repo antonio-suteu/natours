@@ -25,6 +25,7 @@ Database:
 Other Node packages used:
 - dotenv (for storing configuration in the environment separate from code)
 - morgan (an HTTP request logger middleware for Node.js)
+- multer (for uploading files)
 - validator (a library of string validators and sanitizers)
 - slugify (for string slugification)
 - esbuild (for front end script bundling)
