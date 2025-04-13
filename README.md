@@ -24,6 +24,7 @@ Database:
 
 Other Node packages used:
 - dotenv (for storing configuration in the environment separate from code)
+- nodemailer (for email sending)
 - morgan (an HTTP request logger middleware for Node.js)
 - multer (for uploading files)
 - sharp (for resizing uploaded images)
