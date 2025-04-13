@@ -1,4 +1,4 @@
-const fs = require('fs');
+//const fs = require('fs');
 const multer = require('multer');
 const sharp = require('sharp');
 const Tour = require('../models/tourModel');
