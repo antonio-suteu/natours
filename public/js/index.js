@@ -38,9 +38,6 @@ if (logOutBtn) {
 if (saveUserDataForm) {
   saveUserDataForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    // const name = $('#name').value;
-    // const email = $('#email').value;
-    // updateSettings({ name, email }, 'data');
 
     // Create a FormData object to handle file uploads
     const form = new FormData();

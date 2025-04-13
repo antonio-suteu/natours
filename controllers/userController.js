@@ -1,4 +1,5 @@
 //const APIFeatures = require('../utils/apiFeatures');
+const fs = require('fs');
 const multer = require('multer');
 const sharp = require('sharp');
 const User = require('../models/userModel');
@@ -34,6 +35,16 @@ const upload = multer({
 });
 
 exports.uploadUserPhoto = upload.single('photo');
+exports.deleteUserPhoto = (req, res, next) => {
+  if (!req.user.photo.includes('default')) {
+    const path = `public/img/users/${req.user.photo}`;
+    fs.unlink(path, (val) => {
+      //if (err) console.log(err);
+    });
+  }
+
+  next();
+};
 exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
   if (!req.file) return next();
   //1) Create a unique filename
