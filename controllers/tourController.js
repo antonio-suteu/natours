@@ -1,3 +1,6 @@
+const fs = require('fs');
+const multer = require('multer');
+const sharp = require('sharp');
 const Tour = require('../models/tourModel');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
@@ -15,6 +18,75 @@ exports.aliasTopTours = (req, res, next) => {
 };
 
 //#endregion
+
+// #region multer middleware config for image uploa
+const multerStorage = multer.memoryStorage(); // Store the image in memory
+
+const multerFilter = (req, file, cb) => {
+  // Accept only images
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(new AppError('Not an image! Please upload only images.', 400), false);
+  }
+};
+
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter
+});
+
+exports.uploadTourImages = upload.fields([
+  { name: 'imageCover', maxCount: 1 },
+  { name: 'images', maxCount: 3 }
+]);
+// exports.deleteTourPhotos = (req, res, next) => {
+
+//   const path = `public/img/tours/tour-${req.params.id}-cover.jpeg`;
+//   fs.unlink(path, (val) => {
+//     //if (err) console.log(err);
+//   });
+
+//   next();
+// };
+exports.resizeTourImages = catchAsync(async (req, res, next) => {
+  if (!req.files.imageCover && !req.files.images) return next();
+
+  // A) Cover Image
+  //1) Create a unique filename and set it to the body of the request
+  //  (needed by the next middleware what will actcually save the tour image)
+  if (req.files.imageCover) {
+    req.body.imageCover = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
+
+    // 2) Resize the image using sharp
+    await sharp(req.files.imageCover[0].buffer)
+      .resize(2000, 1333)
+      .toFormat('jpeg')
+      .jpeg({ quality: 90 })
+      .toFile(`public/img/tours/${req.body.imageCover}`);
+  }
+
+  // B) Images
+  if (req.files.images) {
+    req.body.images = [];
+    await Promise.all(
+      req.files.images.map(async (file, i) => {
+        const filename = `tour-${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
+
+        await sharp(file.buffer)
+          .resize(2000, 1333)
+          .toFormat('jpeg')
+          .jpeg({ quality: 90 })
+          .toFile(`public/img/tours/${filename}`);
+
+        req.body.images.push(filename);
+      })
+    );
+  }
+
+  next();
+});
+// #endregion
 
 exports.createNewTour = factory.createOne(Tour);
 exports.getTour = factory.getOne(Tour, {
