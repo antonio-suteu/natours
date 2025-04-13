@@ -36,6 +36,21 @@ if (logOutBtn) {
 }
 
 if (saveUserDataForm) {
+  const photoInput = $('#photo');
+  const userPhotoElement = $('.form__user-photo');
+
+  photoInput.addEventListener('change', function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Read and display the image in the existing photo element
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      userPhotoElement.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
   saveUserDataForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 

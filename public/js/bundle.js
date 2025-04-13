@@ -2612,14 +2612,25 @@
     logOutBtn.addEventListener("click", logout);
   }
   if (saveUserDataForm) {
+    const photoInput = $("#photo");
+    const userPhotoElement = $(".form__user-photo");
+    photoInput.addEventListener("change", function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e2) {
+        userPhotoElement.src = e2.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
     saveUserDataForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const form = new FormData();
       form.append("name", $("#name").value);
       form.append("email", $("#email").value);
-      const photoInput = $("#photo");
-      if (photoInput.files.length > 0) {
-        form.append("photo", photoInput.files[0]);
+      const photoInput2 = $("#photo");
+      if (photoInput2.files.length > 0) {
+        form.append("photo", photoInput2.files[0]);
       }
       const saveButton = $("#saveUserDataBtn");
       saveButton.textContent = "Saving...";
