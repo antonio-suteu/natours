@@ -8,20 +8,22 @@ module.exports = class Email {
     this.to = user.email;
     this.firstName = user.name.split(' ')[0];
     this.url = url;
-    this.from = `Antonio Suteu <${process.env.EMAIL_FROM}>`;
+    this.from = `Natours Administrator <${process.env.EMAIL_FROM}>`;
   }
 
   newTransport() {
     if (process.env.NODE_ENV === 'production') {
-      // SendGrid
-      // return nodemailer.createTransport({
-      //   service: 'SendGrid',
-      //   auth: {
-      //     user: process.env.SENDGRID_USERNAME,
-      //     pass: process.env.SENDGRID_PASSWORD
-      //   }
-      // });
-      return 1;
+      // Brevo
+      return nodemailer.createTransport({
+        host: process.env.BREVO_HOST,
+        port: process.env.BREVO_PORT,
+        logger: true,
+        //secure: false,
+        auth: {
+          user: process.env.BREVO_USERNAME,
+          pass: process.env.BREVO_PASSWORD
+        }
+      });
     }
 
     // 1) Create a transporter (DEV Mode with MailTrap)
