@@ -4,6 +4,7 @@
 **Features:**
 - Authorization & Authentication (JWT)
 - Users can book tours & leave reviews
+- Credit Card Payments using Stripe
 - Administrators can edit/delete reviews
 - Discover tours that begin within a specified location and radius
 -  Tour statistics
