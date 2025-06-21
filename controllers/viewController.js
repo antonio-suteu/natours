@@ -38,6 +38,12 @@ exports.getLoginForm = (_req, res) => {
   });
 };
 
+exports.getCheckout = (req, res) => {
+  res.status(200).render('checkout', {
+    title: 'Checkout'
+  });
+};
+
 exports.getAccount = (req, res) => {
   res.status(200).render('account', {
     title: 'Your account'

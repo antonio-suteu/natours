@@ -3,6 +3,7 @@
 import { displayMap } from './leaflet_setup';
 import { login, logout } from './login';
 import { updateSettings } from './updateSettings';
+import { bookTour } from './stripe';
 
 const $ = document.querySelector.bind(document);
 
@@ -12,6 +13,7 @@ const loginForm = $('.form-login');
 const logOutBtn = $('.nav__el--logout');
 const saveUserDataForm = $('.form-user-data');
 const savePasswordForm = $('.form-user-settings');
+const bookTourBtn = $('#book-bour');
 
 // VALUES
 
@@ -102,5 +104,16 @@ if (savePasswordForm) {
 
     // Reset button text
     savePasswordBtn.textContent = 'Save password';
+  });
+}
+
+if (bookTourBtn) {
+  bookTourBtn.addEventListener('click', (e) => {
+    e.target.textContent = 'Processing...';
+    // Get the tour ID from the button's data attribute
+    const { tourId } = e.target.dataset;
+
+    bookTour(tourId);
+    e.target.textContent = 'Success! Redirecting...';
   });
 }

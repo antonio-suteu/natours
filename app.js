@@ -16,6 +16,7 @@ const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
+const bookingRouter = require('./routes/bookingRoutes');
 const viewRouter = require('./routes/viewRoutes');
 
 const app = express();
@@ -38,14 +39,19 @@ app.use(express.static(path.join(__dirname, 'public')));
 const scriptSrcUrls = [
   'https://unpkg.com/',
   'https://tile.openstreetmap.org',
-  'https://cdnjs.cloudflare.com'
+  'https://cdnjs.cloudflare.com',
+  'https://js.stripe.com'
 ];
 const styleSrcUrls = [
   'https://unpkg.com/',
   'https://tile.openstreetmap.org',
   'https://fonts.googleapis.com/'
 ];
-const connectSrcUrls = ['https://unpkg.com', 'https://tile.openstreetmap.org'];
+const connectSrcUrls = [
+  'https://unpkg.com',
+  'https://tile.openstreetmap.org',
+  'https://checkout.stripe.com'
+];
 const fontSrcUrls = ['fonts.googleapis.com', 'fonts.gstatic.com'];
 
 app.use(
@@ -58,7 +64,8 @@ app.use(
       workerSrc: ["'self'", 'blob:'],
       objectSrc: [],
       imgSrc: ["'self'", 'blob:', 'data:', 'https:'],
-      fontSrc: ["'self'", ...fontSrcUrls]
+      fontSrc: ["'self'", ...fontSrcUrls],
+      frameSrc: ["'self'", 'https://js.stripe.com']
     }
   })
 );
@@ -123,6 +130,7 @@ app.use('/', viewRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/reviews', reviewRouter);
+app.use('/api/v1/bookings', bookingRouter);
 
 // middleware for handling all the HTTP requests with an invalid url
 // PLACE AT THE END OF ROUTES DEFINITION

@@ -24,4 +24,10 @@ router.get(
 //router.use(authController.protect);
 router.get('/me', authController.protect, viewController.getAccount);
 
+router.get(
+  '/checkout/:tourID',
+  authController.protect,
+  viewController.getCheckout
+);
+
 module.exports = router;

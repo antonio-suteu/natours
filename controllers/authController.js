@@ -262,7 +262,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
 // #endregion
 
-// # region Change Password (Authenticated users only)
+// #region Change Password (Authenticated users only)
 exports.updatePassword = catchAsync(async (req, res, next) => {
   // 1) Get user from collection
   //add the password field to the select, since in the schema it's hidden by default
@@ -282,4 +282,4 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   // 4) Log the user in (send JWT)
   createSendToken(user, 200, res);
 });
-// # endregion
+// #endregion

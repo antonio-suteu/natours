@@ -2589,6 +2589,27 @@
     }
   };
 
+  // public/js/stripe.js
+  var stripe = Stripe(
+    "pk_test_51RFdeIPuRB5fNeA7fg8gYmsj9z6PKmslUDLiMAXgo27wTqKw3nRbDWqKIeD7g4mTHmkFFtFP3lerAZB2bqOeLP3m00aMRfUf3J"
+  );
+  var bookTour = async (tourId) => {
+    try {
+      const session = await axios_default({
+        method: "POST",
+        url: `http://localhost:8000/api/v1/bookings/checkout-session/${tourId}`
+      });
+      window.location.href = session.data.checkoutUrl;
+    } catch (err) {
+      console.error("Error in bookTour:", err);
+      showAlert(
+        "error",
+        "An error occurred while booking the tour. Please try again later."
+      );
+      return;
+    }
+  };
+
   // public/js/index.js
   var $ = document.querySelector.bind(document);
   var mapContainer = $("#map");
@@ -2596,6 +2617,7 @@
   var logOutBtn = $(".nav__el--logout");
   var saveUserDataForm = $(".form-user-data");
   var savePasswordForm = $(".form-user-settings");
+  var bookTourBtn = $("#book-bour");
   if (mapContainer) {
     const locations = JSON.parse(mapContainer.dataset.locations);
     displayMap(locations);
@@ -2658,6 +2680,14 @@
       $("#password").value = "";
       $("#password-confirm").value = "";
       savePasswordBtn.textContent = "Save password";
+    });
+  }
+  if (bookTourBtn) {
+    bookTourBtn.addEventListener("click", (e) => {
+      e.target.textContent = "Processing...";
+      const { tourId } = e.target.dataset;
+      bookTour(tourId);
+      e.target.textContent = "Success! Redirecting...";
     });
   }
 })();
