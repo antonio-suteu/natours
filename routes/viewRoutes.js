@@ -1,6 +1,7 @@
 const express = require('express');
 const viewController = require('../controllers/viewController');
 const authController = require('../controllers/authController');
+const bookingController = require('../controllers/bookingController');
 
 const router = express.Router();
 
@@ -8,7 +9,12 @@ const router = express.Router();
 // (we get access to his data trough 'user' varaible)
 //router.use(authController.isUserLoggedIn);
 
-router.get('/', authController.isUserLoggedIn, viewController.getOverview);
+router.get(
+  '/',
+  bookingController.createBookingCheckout, //only temporary, (will use webhooks for deployed website)
+  authController.isUserLoggedIn,
+  viewController.getOverview
+);
 router.get(
   '/tour/:slug',
   authController.isUserLoggedIn,

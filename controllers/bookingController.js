@@ -1,9 +1,11 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Tour = require('../models/tourModel');
+const Booking = require('../models/bookingModel');
 //const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 //const factory = require('./handlerFactory');
 
+// used by the normal user to start the booking process
 exports.createCheckoutSession = catchAsync(async (req, res, next) => {
   // 1) Get the currently booked tour
   const tour = await Tour.findById(req.params.tourID);
@@ -37,7 +39,7 @@ exports.createCheckoutSession = catchAsync(async (req, res, next) => {
     line_items: productConfig,
     mode: 'payment',
     ui_mode: 'hosted',
-    success_url: `${req.protocol}://${req.get('host')}/`,
+    success_url: `${req.protocol}://${req.get('host')}/?tour=${tour.id}&user=${req.user.id}&price=${tour.price}`,
     cancel_url: `${req.protocol}://${req.get('host')}/tour/${tour.slug}`
   };
 
@@ -49,4 +51,18 @@ exports.createCheckoutSession = catchAsync(async (req, res, next) => {
     status: 'success',
     checkoutUrl: session.url
   });
+});
+
+// This is only TEMPORARY
+exports.createBookingCheckout = catchAsync(async (req, res, next) => {
+  // It is used to create a booking after a successful payment
+  const { tour, user, price } = req.query;
+
+  if (!tour && !user && !price) return next();
+
+  // Create a booking in the database
+  await Booking.create({ tour, user, price });
+
+  // Redirect to the overview page (with removed query parameters)
+  res.redirect(req.originalUrl.split('?')[0]);
 });
