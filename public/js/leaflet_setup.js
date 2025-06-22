@@ -26,7 +26,7 @@ export const displayMap = (locations, duration) => {
     // If no next location, assume it's the last day
     const endDay = nextLocation ? nextLocation.day - 1 : tourLastDay;
     const dayText =
-      currentDay === endDay
+      currentDay == endDay
         ? `Day ${currentDay}`
         : `Days ${currentDay} – ${endDay}`;
 
