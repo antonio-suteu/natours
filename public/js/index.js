@@ -20,7 +20,8 @@ const bookTourBtn = $('#book-bour');
 // DELEGATION
 if (mapContainer) {
   const locations = JSON.parse(mapContainer.dataset.locations);
-  displayMap(locations);
+  const duration = $('#tour-duration-label').innerText;
+  displayMap(locations, duration);
 }
 
 if (loginForm) {

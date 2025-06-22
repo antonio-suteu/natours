@@ -1,5 +1,5 @@
 /*eslint-disable */
-export const displayMap = (locations) => {
+export const displayMap = (locations, duration) => {
   // Leaflet Map initialization
   var map = L.map('map', { zoomControl: false, dragging: false });
 
@@ -9,6 +9,8 @@ export const displayMap = (locations) => {
   }).addTo(map);
 
   const points = [];
+  const tourLastDay = duration.split(' ')[0];
+
   locations.forEach((loc, index) => {
     // location pin (each location is counted)
     const icon = L.divIcon({
@@ -21,11 +23,12 @@ export const displayMap = (locations) => {
     // Calculate day range
     const currentDay = loc.day;
     const nextLocation = locations[index + 1];
-    const endDay = nextLocation ? nextLocation.day - 1 : currentDay; // If no next location, assume it's the last day
+    // If no next location, assume it's the last day
+    const endDay = nextLocation ? nextLocation.day - 1 : tourLastDay;
     const dayText =
       currentDay === endDay
         ? `Day ${currentDay}`
-        : `Days ${currentDay}–${endDay}`;
+        : `Days ${currentDay} – ${endDay}`;
 
     points.push([loc.coordinates[1], loc.coordinates[0]]);
     L.marker([loc.coordinates[1], loc.coordinates[0]], { icon })
