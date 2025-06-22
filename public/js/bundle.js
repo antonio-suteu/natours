@@ -12,7 +12,7 @@
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
     const points = [];
-    const tourLastDay = duration.split(" ")[0];
+    const tourLastDay = duration.split(" ")[0] * 1;
     locations.forEach((loc, index) => {
       const icon = L.divIcon({
         className: "custom-div-icon",
@@ -23,7 +23,7 @@
       const currentDay = loc.day;
       const nextLocation = locations[index + 1];
       const endDay = nextLocation ? nextLocation.day - 1 : tourLastDay;
-      const dayText = currentDay == endDay ? `Day ${currentDay}` : `Days ${currentDay} \u2013 ${endDay}`;
+      const dayText = currentDay === endDay ? `Day ${currentDay}` : `Days ${currentDay} \u2013 ${endDay}`;
       points.push([loc.coordinates[1], loc.coordinates[0]]);
       L.marker([loc.coordinates[1], loc.coordinates[0]], { icon }).addTo(map).bindPopup(`<p><span>${dayText}:</span> ${loc.description}</p>`, {
         autoClose: false
