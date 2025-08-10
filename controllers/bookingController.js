@@ -3,7 +3,7 @@ const Tour = require('../models/tourModel');
 const Booking = require('../models/bookingModel');
 //const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
-//const factory = require('./handlerFactory');
+const factory = require('./handlerFactory');
 
 // used by the normal user to start the booking process
 exports.createCheckoutSession = catchAsync(async (req, res, next) => {
@@ -53,7 +53,7 @@ exports.createCheckoutSession = catchAsync(async (req, res, next) => {
   });
 });
 
-// This is only TEMPORARY
+//TODO: Remove this (This is only TEMPORARY)
 exports.createBookingCheckout = catchAsync(async (req, res, next) => {
   // It is used to create a booking after a successful payment
   const { tour, user, price } = req.query;
@@ -66,3 +66,10 @@ exports.createBookingCheckout = catchAsync(async (req, res, next) => {
   // Redirect to the overview page (with removed query parameters)
   res.redirect(req.originalUrl.split('?')[0]);
 });
+
+// CRUD Operations
+exports.createBooking = factory.createOne(Booking);
+exports.getBooking = factory.getOne(Booking);
+exports.getAllBookings = factory.getAll(Booking);
+exports.updateBooking = factory.updateOne(Booking);
+exports.deleteBooking = factory.deleteOne(Booking);

@@ -125,7 +125,7 @@ tourSchema.index({ startLocation: '2dsphere' });
 // we use a regular function because we use 'this' keyword
 // we can't use these properties in queries
 tourSchema.virtual('durationWeeks').get(function () {
-  return this.duration / 7;
+  return Math.round((this.duration / 7) * 10) / 10;
 });
 
 // create a virtual populate for accessing the tour reviews

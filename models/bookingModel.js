@@ -29,20 +29,18 @@ const bookingSchema = new mongoose.Schema({
 // #region QUERY MIDDLEWARE runs before the query gets executed
 // /^find/ is a regex that matches the strings that start with 'find'
 
-// bookingSchema.pre(/^find/, function (next) {
-//   // this fills our the tour and user data from the arrays of id's
-//   this.populate({
-//     path: 'tour',
-//     select: 'name'
-//   });
+bookingSchema.pre(/^find/, function (next) {
+  // this fills our the tour and user data from the arrays of id's
+  this.populate({
+    path: 'tour',
+    select: 'name duration'
+  }).populate({
+    path: 'user',
+    select: 'name email'
+  });
 
-//   this.populate({
-//     path: 'user',
-//     select: 'name email'
-//   });
-
-//   next();
-// });
+  next();
+});
 
 // #endregion
 
