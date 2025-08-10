@@ -29,6 +29,7 @@ router.get(
 // protect all routes after this middleware
 //router.use(authController.protect);
 router.get('/me', authController.protect, viewController.getAccount);
+router.get('/my-tours', authController.protect, viewController.getMyTours);
 
 router.get(
   '/checkout/:tourID',

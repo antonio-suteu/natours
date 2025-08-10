@@ -1,5 +1,6 @@
 const Tour = require('../models/tourModel');
 const User = require('../models/userModel');
+const Booking = require('../models/bookingModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
@@ -49,6 +50,22 @@ exports.getAccount = (req, res) => {
     title: 'Your account'
   });
 };
+
+// This could have used a virtual populate
+exports.getMyTours = catchAsync(async (req, res, next) => {
+  // 1) Get all bookings for the logged in user
+  const bookings = await Booking.find({ user: req.user.id });
+
+  // 2) Get the tours for those bookings
+  const tourIDs = bookings.map((booking) => booking.tour);
+  const tours = await Tour.find({ _id: { $in: tourIDs } });
+
+  // 3) Render the 'my-tours' page with the tours data
+  res.status(200).render('overview', {
+    title: 'My Tours',
+    tours
+  });
+});
 
 exports.updateUserData = catchAsync(async (req, res, next) => {
   const updatedUser = await User.findByIdAndUpdate(
