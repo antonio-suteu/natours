@@ -40,11 +40,11 @@ exports.uploadTourImages = upload.fields([
   { name: 'imageCover', maxCount: 1 },
   { name: 'images', maxCount: 3 }
 ]);
-// exports.deleteTourPhotos = (req, res, next) => {
 
+// exports.deleteTourPhotos = (req, res, next) => {
 //   const path = `public/img/tours/tour-${req.params.id}-cover.jpeg`;
 //   fs.unlink(path, (val) => {
-//     //if (err) console.log(err);
+//      if (err) console.log(err);
 //   });
 
 //   next();

@@ -7,11 +7,10 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
-
+const compression = require('compression');
 // global error handling class
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
-
 // routers
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
@@ -141,5 +140,7 @@ app.all('*', (req, res, next) => {
 
 // global error handling middleware
 app.use(globalErrorHandler);
+
+app.use(compression()); // compress all responses
 
 module.exports = app;

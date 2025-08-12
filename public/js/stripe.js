@@ -10,7 +10,7 @@ export const bookTour = async (tourId) => {
     // 1) Get checkout session from API
     const session = await axios({
       method: 'POST',
-      url: `http://localhost:8000/api/v1/bookings/checkout-session/${tourId}`
+      url: `/api/v1/bookings/checkout-session/${tourId}`
     });
 
     // 2) redirect to Stripe checkout page
